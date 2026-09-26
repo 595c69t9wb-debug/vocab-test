@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>506단어 집중 암기</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--soft:#f3f4f6;--green:#15803d;--greenbg:#f0fdf4;--red:#b91c1c;--redbg:#fff5f5;--amber:#92400e;--accent:#111827}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:820px;margin:auto;padding:18px 14px 64px}
+h1{font-size:24px;margin:0 0 5px;letter-spacing:-.5px}
+.sub{color:var(--muted);font-size:13px;line-height:1.55}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:14px;margin:13px 0}
+.section-title{font-size:14px;font-weight:900;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 7px;text-align:center}
+.stat b{display:block;font-size:20px;margin-bottom:2px}
+.stat span{font-size:11px;color:var(--muted)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:12px;color:var(--muted);font-weight:800;margin:0 0 6px}
+select{width:100%;border:1px solid #d1d5db;background:white;border-radius:11px;padding:11px 10px;color:var(--text)}
+.range-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.pill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.choice{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 6px;font-weight:800;font-size:13px;color:#374151}
+.choice.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.start{width:100%;border:0;background:var(--accent);color:white;border-radius:12px;padding:13px;font-weight:900;margin-top:12px}
+.start:disabled{opacity:.45}
+.quiz{display:grid;gap:10px}
+.q{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px}
+.q.correct{background:var(--greenbg);border-color:#86efac}
+.q.wrong{background:var(--redbg);border-color:#fca5a5}
+.qhead{display:flex;gap:9px;align-items:flex-start}
+.qnum{width:29px;height:29px;flex:none;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-size:12px;font-weight:900}
+.qmain{min-width:0;flex:1}
+.prompt{font-size:18px;font-weight:900;line-height:1.35;overflow-wrap:anywhere}
+.meta{font-size:11px;color:var(--muted);margin-top:4px}
+.dir{font-size:11px;color:var(--muted);white-space:nowrap;padding-top:4px}
+.answer-input{width:100%;margin-top:11px;border:1.5px solid #d1d5db;border-radius:11px;padding:12px;font-size:16px;outline:none;background:#fff}
+.answer-input:focus{border-color:#6b7280}
+.answer-input:disabled{background:rgba(255,255,255,.65);color:#374151}
+.feedback{display:none;margin-top:9px;font-size:13px;line-height:1.55}
+.q.graded .feedback{display:block}
+.good{font-weight:900;color:var(--green)}
+.bad{font-weight:900;color:var(--red)}
+.answer-line{margin-top:3px}
+.actions{position:sticky;bottom:0;padding:11px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 25%);margin-top:12px}
+.result{display:none;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px}
+.result.show{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.score{font-size:23px;font-weight:950}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.action-btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:12px 8px;font-weight:900}
+.action-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.action-btn:disabled{opacity:.4}
+.retry{display:none;width:100%;margin-top:8px}
+.retry.show{display:block}
+.empty{display:none;background:#fff;border:1px dashed #cbd5e1;border-radius:16px;padding:28px 16px;text-align:center;color:var(--muted);line-height:1.6}
+.empty.show{display:block}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.linkbtn{border:0;background:transparent;color:#6b7280;text-decoration:underline;padding:5px 0;font-size:12px}
+.tip{background:#fffbeb;border:1px solid #fde68a;border-radius:13px;padding:11px 12px;font-size:12px;line-height:1.55;color:#78350f;margin-top:10px}
+@media(max-width:560px){
+  .stats{grid-template-columns:repeat(4,1fr);gap:6px}
+  .stat{padding:9px 3px} .stat b{font-size:18px} .stat span{font-size:10px}
+  .row{grid-template-columns:1fr}
+  .pill-grid{grid-template-columns:repeat(2,1fr)}
+  .range-grid{grid-template-columns:repeat(2,1fr)}
+  .prompt{font-size:17px}
+  .mode-grid .choice{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>506단어 집중 암기</h1>
+  <div class="sub">원본 506개 항목에서 <b>영어가 같은 단어는 한 문제로 통합</b>했어. 총 <b>442문제</b> · 중복 번호는 쉼표로 함께 표시 · 추가 뜻은 합치고 같은 뜻은 제외.</div>
+
+  <div class="stats">
+    <div class="stat"><b id="statTotal">442</b><span>전체</span></div>
+    <div class="stat"><b id="statUnseen">442</b><span>미출제</span></div>
+    <div class="stat"><b id="statWrong">0</b><span>오답</span></div>
+    <div class="stat"><b id="statMastered">0</b><span>3연속 정답</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">1. 범위</div>
+    <div class="range-grid" id="rangeGrid">
+      <button class="choice active" data-range="all" type="button">전체 1~506</button>
+      <button class="choice" data-range="1-100" type="button">1~100</button>
+      <button class="choice" data-range="101-200" type="button">101~200</button>
+      <button class="choice" data-range="201-300" type="button">201~300</button>
+      <button class="choice" data-range="301-400" type="button">301~400</button>
+      <button class="choice" data-range="401-506" type="button">401~506</button>
+    </div>
+
+    <div class="section-title" style="margin-top:15px">2. 어떤 단어를 풀까?</div>
+    <div class="pill-grid" id="poolGrid">
+      <button class="choice active" data-pool="all" type="button">범위 내 전체</button>
+      <button class="choice" data-pool="wrong" type="button">오답만</button>
+      <button class="choice" data-pool="unseen" type="button">미출제만</button>
+      <button class="choice" data-pool="unmastered" type="button">졸업 전만</button>
+    </div>
+
+    <div class="section-title" style="margin-top:15px">3. 시험 방식</div>
+    <div class="mode-grid" id="modeGrid">
+      <button class="choice active" data-mode="mix" type="button">랜덤 혼합</button>
+      <button class="choice" data-mode="en-ko" type="button">영어 → 한글</button>
+      <button class="choice" data-mode="ko-en" type="button">한글 → 영어</button>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <div class="field">
+        <label for="countSelect">문제 수</label>
+        <select id="countSelect">
+          <option value="10" selected>10문제</option>
+          <option value="20">20문제</option>
+          <option value="50">50문제</option>
+          <option value="all">선택 범위 전부</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>현재 출제 가능</label>
+        <div style="height:42px;border:1px solid var(--line);border-radius:11px;display:flex;align-items:center;padding:0 11px;background:#fafafa;font-weight:850">
+          <span id="poolCount">442</span>개
+        </div>
+      </div>
+    </div>
+
+    <button id="startBtn" class="start" type="button">문제 만들기</button>
+    <div class="tip">오답은 자동 저장돼. 틀린 단어는 <b>다른 시점에 3번 연속 맞으면 오답 목록에서 졸업</b>해. 한글→영어는 합쳐진 뜻 중 하나가 랜덤으로 나와서 여러 의미를 따로 연습할 수 있어.</div>
+    <div class="tools"><span class="sub">학습 기록은 이 브라우저에만 저장돼.</span><button id="resetBtn" class="linkbtn" type="button">학습기록 초기화</button></div>
+  </div>
+
+  <div id="empty" class="empty">조건에 맞는 단어가 없어.<br>범위나 출제 대상을 바꿔줘.</div>
+  <div id="quiz" class="quiz"></div>
+
+  <div class="actions" id="actions" style="display:none">
+    <div id="result" class="result">
+      <div><div class="sub">점수</div><div id="score" class="score">0 / 10</div></div>
+      <div id="missed" class="sub"></div>
+    </div>
+    <div class="action-grid">
+      <button id="gradeBtn" class="action-btn primary" type="button">채점하기</button>
+      <button id="newBtn" class="action-btn" type="button">새 문제</button>
+    </div>
+    <button id="retryBtn" class="action-btn retry" type="button">이번에 틀린 문제만 다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const WORDS=[{"id":1,"key":"look at","nos":[1],"en":"look at","meanings":["~을 보다"],"ko":"~을 보다"},{"id":2,"key":"monitor","nos":[2],"en":"monitor","meanings":["모니터"],"ko":"모니터"},{"id":3,"key":"push","nos":[3],"en":"push","meanings":["밀다"],"ko":"밀다"},{"id":4,"key":"cart","nos":[4],"en":"cart","meanings":["카트","수레"],"ko":"카트, 수레"},{"id":5,"key":"hold","nos":[5,182],"en":"hold","meanings":["잡다","열다","개최하다"],"ko":"잡다, 열다, 개최하다"},{"id":6,"key":"wear","nos":[6],"en":"wear","meanings":["입고 있다(상태)"],"ko":"입고 있다(상태)"},{"id":7,"key":"put on","nos":[7],"en":"put on","meanings":["입고 있다(동작)"],"ko":"입고 있다(동작)"},{"id":8,"key":"ride","nos":[8],"en":"ride","meanings":["타다"],"ko":"타다"},{"id":9,"key":"bicycle","nos":[9],"en":"bicycle","meanings":["자전거"],"ko":"자전거"},{"id":10,"key":"carry","nos":[10],"en":"carry","meanings":["나르다"],"ko":"나르다"},{"id":11,"key":"reach for","nos":[11],"en":"reach for","meanings":["~을 향해 손을 뻗다"],"ko":"~을 향해 손을 뻗다"},{"id":12,"key":"point at[to]","nos":[12],"en":"point at[to]","meanings":["~을 가리키다"],"ko":"~을 가리키다"},{"id":13,"key":"lean against","nos":[13],"en":"lean against","meanings":["~에 기대다"],"ko":"~에 기대다"},{"id":14,"key":"wall","nos":[14],"en":"wall","meanings":["벽"],"ko":"벽"},{"id":15,"key":"wait in line","nos":[15],"en":"wait in line","meanings":["줄 서서 기다리다"],"ko":"줄 서서 기다리다"},{"id":16,"key":"face","nos":[16],"en":"face","meanings":["마주보다"],"ko":"마주보다"},{"id":17,"key":"each other","nos":[17],"en":"each other","meanings":["서로"],"ko":"서로"},{"id":18,"key":"hand","nos":[18],"en":"hand","meanings":["건네주다"],"ko":"건네주다"},{"id":19,"key":"greet","nos":[19],"en":"greet","meanings":["인사하다"],"ko":"인사하다"},{"id":20,"key":"shake hands","nos":[20],"en":"shake hands","meanings":["악수하다"],"ko":"악수하다"},{"id":21,"key":"serve","nos":[21],"en":"serve","meanings":["대접하다","제공하다"],"ko":"대접하다, 제공하다"},{"id":22,"key":"meal","nos":[22],"en":"meal","meanings":["식사"],"ko":"식사"},{"id":23,"key":"rest","nos":[23],"en":"rest","meanings":["쉬다"],"ko":"쉬다"},{"id":24,"key":"get on/board","nos":[24],"en":"get on/board","meanings":["타다"],"ko":"타다"},{"id":25,"key":"floor","nos":[25],"en":"floor","meanings":["바닥"],"ko":"바닥"},{"id":26,"key":"under","nos":[26],"en":"under","meanings":["~ 아래에"],"ko":"~ 아래에"},{"id":27,"key":"bridge","nos":[27],"en":"bridge","meanings":["다리"],"ko":"다리"},{"id":28,"key":"along","nos":[28],"en":"along","meanings":["~을 따라"],"ko":"~을 따라"},{"id":29,"key":"between","nos":[29],"en":"between","meanings":["~ 사이에"],"ko":"~ 사이에"},{"id":30,"key":"around","nos":[30],"en":"around","meanings":["~ 주위에"],"ko":"~ 주위에"},{"id":31,"key":"next to/beside","nos":[31],"en":"next to/beside","meanings":["~ 옆에"],"ko":"~ 옆에"},{"id":32,"key":"in front of","nos":[32],"en":"in front of","meanings":["~ 앞에"],"ko":"~ 앞에"},{"id":33,"key":"against","nos":[33],"en":"against","meanings":["~에 기대어"],"ko":"~에 기대어"},{"id":34,"key":"in the corner of","nos":[34],"en":"in the corner of","meanings":["~의 구석에"],"ko":"~의 구석에"},{"id":35,"key":"be planted","nos":[35],"en":"be planted","meanings":["심어져 있다"],"ko":"심어져 있다"},{"id":36,"key":"outdoors","nos":[36],"en":"outdoors","meanings":["야외에"],"ko":"야외에"},{"id":37,"key":"be displayed","nos":[37],"en":"be displayed","meanings":["전시되어 있다"],"ko":"전시되어 있다"},{"id":38,"key":"shelf (복수형 shelves)","nos":[38],"en":"shelf (복수형 shelves)","meanings":["선반"],"ko":"선반"},{"id":39,"key":"be placed[left]","nos":[39],"en":"be placed[left]","meanings":["놓여 있다"],"ko":"놓여 있다"},{"id":40,"key":"be arranged","nos":[40],"en":"be arranged","meanings":["정리되어 있다"],"ko":"정리되어 있다"},{"id":41,"key":"in a circle","nos":[41],"en":"in a circle","meanings":["둥그렇게"],"ko":"둥그렇게"},{"id":42,"key":"be stacked[piled]","nos":[42],"en":"be stacked[piled]","meanings":["쌓여 있다"],"ko":"쌓여 있다"},{"id":43,"key":"be filled with","nos":[43],"en":"be filled with","meanings":["~로 가득 차 있다"],"ko":"~로 가득 차 있다"},{"id":44,"key":"be covered with","nos":[44],"en":"be covered with","meanings":["~로 뒤덮여 있다"],"ko":"~로 뒤덮여 있다"},{"id":45,"key":"be lined up","nos":[45],"en":"be lined up","meanings":["줄지어 있다"],"ko":"줄지어 있다"},{"id":46,"key":"in a row","nos":[46],"en":"in a row","meanings":["일렬로"],"ko":"일렬로"},{"id":47,"key":"be parked","nos":[47],"en":"be parked","meanings":["주차되어 있다"],"ko":"주차되어 있다"},{"id":48,"key":"be hung[hanging]","nos":[48],"en":"be hung[hanging]","meanings":["걸려 있다"],"ko":"걸려 있다"},{"id":49,"key":"printer","nos":[49],"en":"printer","meanings":["프린터"],"ko":"프린터"},{"id":50,"key":"contact","nos":[50,191],"en":"contact","meanings":["연락하다"],"ko":"연락하다"},{"id":51,"key":"manager","nos":[51],"en":"manager","meanings":["관리자","매니저"],"ko":"관리자, 매니저"},{"id":52,"key":"lead","nos":[52],"en":"lead","meanings":["이끌다","진행하다"],"ko":"이끌다, 진행하다"},{"id":53,"key":"department","nos":[53],"en":"department","meanings":["부서"],"ko":"부서"},{"id":54,"key":"guest","nos":[54],"en":"guest","meanings":["손님"],"ko":"손님"},{"id":55,"key":"head","nos":[55,305],"en":"head","meanings":["책임자"],"ko":"책임자"},{"id":56,"key":"security","nos":[56,278,306],"en":"security","meanings":["보안"],"ko":"보안"},{"id":57,"key":"leave for","nos":[57],"en":"leave for","meanings":["~을 향해 떠나다"],"ko":"~을 향해 떠나다"},{"id":58,"key":"budget","nos":[58,222,416,477],"en":"budget","meanings":["예산"],"ko":"예산"},{"id":59,"key":"laptop","nos":[59],"en":"laptop","meanings":["노트북"],"ko":"노트북"},{"id":60,"key":"arrive","nos":[60],"en":"arrive","meanings":["도착하다"],"ko":"도착하다"},{"id":61,"key":"check","nos":[61],"en":"check","meanings":["확인하다","점검하다"],"ko":"확인하다, 점검하다"},{"id":62,"key":"parking lot","nos":[62],"en":"parking lot","meanings":["주차장"],"ko":"주차장"},{"id":63,"key":"basement","nos":[63],"en":"basement","meanings":["지하"],"ko":"지하"},{"id":64,"key":"coat","nos":[64],"en":"coat","meanings":["코트","외투"],"ko":"코트, 외투"},{"id":65,"key":"tourist","nos":[65],"en":"tourist","meanings":["관광객"],"ko":"관광객"},{"id":66,"key":"supervisor","nos":[66,312,343],"en":"supervisor","meanings":["관리자","감독","감독관"],"ko":"관리자, 감독, 감독관"},{"id":67,"key":"post","nos":[67,213,313,439],"en":"post","meanings":["게시하다","공고하다"],"ko":"게시하다, 공고하다"},{"id":68,"key":"calendar","nos":[68],"en":"calendar","meanings":["달력"],"ko":"달력"},{"id":69,"key":"overnight","nos":[69,316],"en":"overnight","meanings":["야간의"],"ko":"야간의"},{"id":70,"key":"flight","nos":[70],"en":"flight","meanings":["비행"],"ko":"비행"},{"id":71,"key":"grand opening","nos":[71],"en":"grand opening","meanings":["개장","개점"],"ko":"개장, 개점"},{"id":72,"key":"shopping mall","nos":[72],"en":"shopping mall","meanings":["쇼핑몰"],"ko":"쇼핑몰"},{"id":73,"key":"be late for","nos":[73],"en":"be late for","meanings":["~에 늦다"],"ko":"~에 늦다"},{"id":74,"key":"employee","nos":[74],"en":"employee","meanings":["직원"],"ko":"직원"},{"id":75,"key":"attend","nos":[75,185],"en":"attend","meanings":["참석하다"],"ko":"참석하다"},{"id":76,"key":"traffic","nos":[76,484],"en":"traffic","meanings":["교통(량)"],"ko":"교통(량)"},{"id":77,"key":"novel","nos":[77],"en":"novel","meanings":["소설"],"ko":"소설"},{"id":78,"key":"movie","nos":[78],"en":"movie","meanings":["영화"],"ko":"영화"},{"id":79,"key":"closed","nos":[79],"en":"closed","meanings":["폐쇄된","닫힌"],"ko":"폐쇄된, 닫힌"},{"id":80,"key":"accident","nos":[80],"en":"accident","meanings":["사고"],"ko":"사고"},{"id":81,"key":"be delayed","nos":[81],"en":"be delayed","meanings":["지연되다"],"ko":"지연되다"},{"id":82,"key":"weather","nos":[82],"en":"weather","meanings":["날씨"],"ko":"날씨"},{"id":83,"key":"on vacation","nos":[83],"en":"on vacation","meanings":["휴가 중"],"ko":"휴가 중"},{"id":84,"key":"quit","nos":[84],"en":"quit","meanings":["그만두다"],"ko":"그만두다"},{"id":85,"key":"conference room","nos":[85,178],"en":"conference room","meanings":["컨퍼런스 룸","회의실"],"ko":"컨퍼런스 룸, 회의실"},{"id":86,"key":"turn","nos":[86],"en":"turn","meanings":["돌다"],"ko":"돌다"},{"id":87,"key":"last night","nos":[87],"en":"last night","meanings":["어젯밤"],"ko":"어젯밤"},{"id":88,"key":"theater","nos":[88],"en":"theater","meanings":["극장"],"ko":"극장"},{"id":89,"key":"at least","nos":[89,315,368],"en":"at least","meanings":["적어도","최소한"],"ko":"적어도, 최소한"},{"id":90,"key":"twice","nos":[90],"en":"twice","meanings":["두 번","두 배"],"ko":"두 번, 두 배"},{"id":91,"key":"shirt","nos":[91],"en":"shirt","meanings":["셔츠"],"ko":"셔츠"},{"id":92,"key":"price","nos":[92],"en":"price","meanings":["가격"],"ko":"가격"},{"id":93,"key":"applicant","nos":[93,285,404],"en":"applicant","meanings":["지원자","신청자"],"ko":"지원자, 신청자"},{"id":94,"key":"candidate","nos":[94,321,389],"en":"candidate","meanings":["후보자","지원자"],"ko":"후보자, 지원자"},{"id":95,"key":"so far","nos":[95],"en":"so far","meanings":["지금까지"],"ko":"지금까지"},{"id":96,"key":"position","nos":[96,376,425],"en":"position","meanings":["직책","자리","일자리"],"ko":"직책, 자리, 일자리"},{"id":97,"key":"suggestion","nos":[97,268],"en":"suggestion","meanings":["제안","의견"],"ko":"제안, 의견"},{"id":98,"key":"proposal","nos":[98],"en":"proposal","meanings":["제안(서)"],"ko":"제안(서)"},{"id":99,"key":"conference call","nos":[99],"en":"conference call","meanings":["전화 회의"],"ko":"전화 회의"},{"id":100,"key":"come up with","nos":[100],"en":"come up with","meanings":["~을 생각해 내다"],"ko":"~을 생각해 내다"},{"id":101,"key":"agenda","nos":[101],"en":"agenda","meanings":["안건"],"ko":"안건"},{"id":102,"key":"deadline","nos":[102,180,329],"en":"deadline","meanings":["마감 시한","마감 (기한)","마감(일)"],"ko":"마감 시한, 마감 (기한), 마감(일)"},{"id":103,"key":"reschedule","nos":[103,181,458],"en":"reschedule","meanings":["일정을 변경하다","(일정을) 다시 잡다","조정하다"],"ko":"일정을 변경하다, (일정을) 다시 잡다, 조정하다"},{"id":104,"key":"assistance","nos":[104],"en":"assistance","meanings":["지원","도움"],"ko":"지원, 도움"},{"id":105,"key":"deal with","nos":[105],"en":"deal with","meanings":["~을 처리하다"],"ko":"~을 처리하다"},{"id":106,"key":"install","nos":[106],"en":"install","meanings":["설치하다"],"ko":"설치하다"},{"id":107,"key":"renovate","nos":[107],"en":"renovate","meanings":["개조하다","보수하다"],"ko":"개조하다, 보수하다"},{"id":108,"key":"out of order","nos":[108],"en":"out of order","meanings":["고장 난"],"ko":"고장 난"},{"id":109,"key":"employ","nos":[109],"en":"employ","meanings":["고용하다"],"ko":"고용하다"},{"id":110,"key":"qualified","nos":[110],"en":"qualified","meanings":["자격 있는"],"ko":"자격 있는"},{"id":111,"key":"assign","nos":[111],"en":"assign","meanings":["(일","직책을) 맡기다"],"ko":"(일, 직책을) 맡기다"},{"id":112,"key":"responsible for","nos":[112],"en":"responsible for","meanings":["~을 담당하는","책임 지는"],"ko":"~을 담당하는, 책임 지는"},{"id":113,"key":"job opening","nos":[113,311],"en":"job opening","meanings":["일자리 공석","공석","구인"],"ko":"일자리 공석, 공석, 구인"},{"id":114,"key":"degree","nos":[114],"en":"degree","meanings":["학위"],"ko":"학위"},{"id":115,"key":"transfer","nos":[115],"en":"transfer","meanings":["전근 가다"],"ko":"전근 가다"},{"id":116,"key":"celebrate","nos":[116],"en":"celebrate","meanings":["기념하다","축하하다"],"ko":"기념하다, 축하하다"},{"id":117,"key":"promotion","nos":[117,275],"en":"promotion","meanings":["승진","홍보","판촉 행사"],"ko":"승진, 홍보, 판촉 행사"},{"id":118,"key":"deserve","nos":[118],"en":"deserve","meanings":["~할 자격이 있다"],"ko":"~할 자격이 있다"},{"id":119,"key":"dedication","nos":[119],"en":"dedication","meanings":["헌신","전념"],"ko":"헌신, 전념"},{"id":120,"key":"take over","nos":[120],"en":"take over","meanings":["인계 받다"],"ko":"인계 받다"},{"id":121,"key":"purchase","nos":[121,272,420],"en":"purchase","meanings":["구매하다","구매(품)","구입","구입하다"],"ko":"구매하다, 구매(품), 구입, 구입하다"},{"id":122,"key":"refund","nos":[122,399,482],"en":"refund","meanings":["환불하다","환불"],"ko":"환불하다, 환불"},{"id":123,"key":"store","nos":[123],"en":"store","meanings":["보관하다","저장하다"],"ko":"보관하다, 저장하다"},{"id":124,"key":"out of stock","nos":[124,197],"en":"out of stock","meanings":["재고가 떨어진","품절인"],"ko":"재고가 떨어진, 품절인"},{"id":125,"key":"available","nos":[125,188],"en":"available","meanings":["이용할 수 있는","시간이 되는","구할 수 있는"],"ko":"이용할 수 있는, 시간이 되는, 구할 수 있는"},{"id":126,"key":"payment","nos":[126],"en":"payment","meanings":["지불"],"ko":"지불"},{"id":127,"key":"book/reserve","nos":[127],"en":"book/reserve","meanings":["예약하다"],"ko":"예약하다"},{"id":128,"key":"luggage","nos":[128],"en":"luggage","meanings":["수하물"],"ko":"수하물"},{"id":129,"key":"sightseeing","nos":[129],"en":"sightseeing","meanings":["관광"],"ko":"관광"},{"id":130,"key":"attraction","nos":[130],"en":"attraction","meanings":["관광명소"],"ko":"관광명소"},{"id":131,"key":"reservation","nos":[131,491],"en":"reservation","meanings":["예약"],"ko":"예약"},{"id":132,"key":"patio","nos":[132,148],"en":"patio","meanings":["테라스"],"ko":"테라스"},{"id":133,"key":"recommend","nos":[133],"en":"recommend","meanings":["추천하다"],"ko":"추천하다"},{"id":134,"key":"exhibit","nos":[134],"en":"exhibit","meanings":["전시","전시회"],"ko":"전시, 전시회"},{"id":135,"key":"furnished","nos":[135],"en":"furnished","meanings":["가구가 비치된"],"ko":"가구가 비치된"},{"id":136,"key":"location","nos":[136,273,436],"en":"location","meanings":["위치","장소","입지"],"ko":"위치, 장소, 입지"},{"id":137,"key":"resident","nos":[137,492],"en":"resident","meanings":["거주민","주민"],"ko":"거주민, 주민"},{"id":138,"key":"get off","nos":[138],"en":"get off","meanings":["내리다"],"ko":"내리다"},{"id":139,"key":"commute","nos":[139],"en":"commute","meanings":["통근하다","통근"],"ko":"통근하다, 통근"},{"id":140,"key":"depart","nos":[140],"en":"depart","meanings":["출발하다"],"ko":"출발하다"},{"id":141,"key":"vehicle","nos":[141],"en":"vehicle","meanings":["차량"],"ko":"차량"},{"id":142,"key":"appointment","nos":[142,192],"en":"appointment","meanings":["약속","예약"],"ko":"약속, 예약"},{"id":143,"key":"identification","nos":[143],"en":"identification","meanings":["신분증","신분 확인"],"ko":"신분증, 신분 확인"},{"id":144,"key":"fill out/complete","nos":[144],"en":"fill out/complete","meanings":["작성하다"],"ko":"작성하다"},{"id":145,"key":"pour","nos":[145],"en":"pour","meanings":["따르다","붓다"],"ko":"따르다, 붓다"},{"id":146,"key":"product","nos":[146],"en":"product","meanings":["제품","상품"],"ko":"제품, 상품"},{"id":147,"key":"repair","nos":[147],"en":"repair","meanings":["수리하다"],"ko":"수리하다"},{"id":148,"key":"adjust","nos":[149],"en":"adjust","meanings":["조정하다"],"ko":"조정하다"},{"id":149,"key":"occupy","nos":[150],"en":"occupy","meanings":["차지하다"],"ko":"차지하다"},{"id":150,"key":"mow","nos":[151],"en":"mow","meanings":["(잔디를) 깎다"],"ko":"(잔디를) 깎다"},{"id":151,"key":"fold","nos":[152],"en":"fold","meanings":["접다","개다"],"ko":"접다, 개다"},{"id":152,"key":"stroll","nos":[153],"en":"stroll","meanings":["거닐다","산책하다"],"ko":"거닐다, 산책하다"},{"id":153,"key":"statue","nos":[154],"en":"statue","meanings":["조각상"],"ko":"조각상"},{"id":154,"key":"wipe","nos":[155],"en":"wipe","meanings":["닦다"],"ko":"닦다"},{"id":155,"key":"counter","nos":[156],"en":"counter","meanings":["계산대","판매대"],"ko":"계산대, 판매대"},{"id":156,"key":"trim","nos":[157],"en":"trim","meanings":["다듬다","손질하다"],"ko":"다듬다, 손질하다"},{"id":157,"key":"grab","nos":[158],"en":"grab","meanings":["잡다"],"ko":"잡다"},{"id":158,"key":"bend","nos":[159],"en":"bend","meanings":["굽히다","숙이다"],"ko":"굽히다, 숙이다"},{"id":159,"key":"remove","nos":[160],"en":"remove","meanings":["제거하다","없애다"],"ko":"제거하다, 없애다"},{"id":160,"key":"gather","nos":[161],"en":"gather","meanings":["모이다","모으다"],"ko":"모이다, 모으다"},{"id":161,"key":"refrigerator","nos":[162],"en":"refrigerator","meanings":["냉장고"],"ko":"냉장고"},{"id":162,"key":"ceiling","nos":[163],"en":"ceiling","meanings":["천장"],"ko":"천장"},{"id":163,"key":"apron","nos":[164],"en":"apron","meanings":["앞치마"],"ko":"앞치마"},{"id":164,"key":"stall","nos":[165],"en":"stall","meanings":["가판대"],"ko":"가판대"},{"id":165,"key":"shovel","nos":[166],"en":"shovel","meanings":["삽","삽질하다"],"ko":"삽, 삽질하다"},{"id":166,"key":"rug","nos":[167],"en":"rug","meanings":["깔개"],"ko":"깔개"},{"id":167,"key":"examine","nos":[168],"en":"examine","meanings":["검사하다","살펴보다"],"ko":"검사하다, 살펴보다"},{"id":168,"key":"overlook","nos":[169],"en":"overlook","meanings":["내려다보다"],"ko":"내려다보다"},{"id":169,"key":"toolbox","nos":[170],"en":"toolbox","meanings":["공구 상자","연장 통"],"ko":"공구 상자, 연장 통"},{"id":170,"key":"briefcase","nos":[171],"en":"briefcase","meanings":["서류 가방"],"ko":"서류 가방"},{"id":171,"key":"work","nos":[172],"en":"work","meanings":["작업하다","일하다"],"ko":"작업하다, 일하다"},{"id":172,"key":"platform","nos":[173],"en":"platform","meanings":["승강장"],"ko":"승강장"},{"id":173,"key":"load","nos":[174],"en":"load","meanings":["싣다"],"ko":"싣다"},{"id":174,"key":"secretary","nos":[175],"en":"secretary","meanings":["비서"],"ko":"비서"},{"id":175,"key":"retire","nos":[176],"en":"retire","meanings":["퇴직하다"],"ko":"퇴직하다"},{"id":176,"key":"responsible","nos":[177],"en":"responsible","meanings":["책임지고 있는","담당하는"],"ko":"책임지고 있는, 담당하는"},{"id":177,"key":"make it","nos":[179],"en":"make it","meanings":["(시간 맞춰) 가다","참석하다"],"ko":"(시간 맞춰) 가다, 참석하다"},{"id":178,"key":"exit","nos":[183],"en":"exit","meanings":["출구","나가다"],"ko":"출구, 나가다"},{"id":179,"key":"renovation","nos":[184],"en":"renovation","meanings":["보수","개조"],"ko":"보수, 개조"},{"id":180,"key":"maintenance","nos":[186],"en":"maintenance","meanings":["정비","유지보수"],"ko":"정비, 유지보수"},{"id":181,"key":"get to","nos":[187],"en":"get to","meanings":["~에 도착하다"],"ko":"~에 도착하다"},{"id":182,"key":"presentation","nos":[189],"en":"presentation","meanings":["발표"],"ko":"발표"},{"id":183,"key":"fill out","nos":[190],"en":"fill out","meanings":["작성하다"],"ko":"작성하다"},{"id":184,"key":"prefer","nos":[193],"en":"prefer","meanings":["선호하다"],"ko":"선호하다"},{"id":185,"key":"locate","nos":[194],"en":"locate","meanings":["~에 두다","위치시키다"],"ko":"~에 두다, 위치시키다"},{"id":186,"key":"mind","nos":[195],"en":"mind","meanings":["꺼리다"],"ko":"꺼리다"},{"id":187,"key":"cafeteria","nos":[196],"en":"cafeteria","meanings":["구내식당"],"ko":"구내식당"},{"id":188,"key":"impressive","nos":[198],"en":"impressive","meanings":["인상적인"],"ko":"인상적인"},{"id":189,"key":"spare","nos":[199],"en":"spare","meanings":["남는","여분의"],"ko":"남는, 여분의"},{"id":190,"key":"broken","nos":[200],"en":"broken","meanings":["고장 난"],"ko":"고장 난"},{"id":191,"key":"overwork","nos":[201],"en":"overwork","meanings":["과로","초과 근무"],"ko":"과로, 초과 근무"},{"id":192,"key":"stop by","nos":[202],"en":"stop by","meanings":["잠깐 들르다"],"ko":"잠깐 들르다"},{"id":193,"key":"borrow","nos":[203],"en":"borrow","meanings":["빌리다"],"ko":"빌리다"},{"id":194,"key":"business hours","nos":[204],"en":"business hours","meanings":["영업시간"],"ko":"영업시간"},{"id":195,"key":"merchandise","nos":[205],"en":"merchandise","meanings":["물품","상품"],"ko":"물품, 상품"},{"id":196,"key":"inquire","nos":[206],"en":"inquire","meanings":["문의하다"],"ko":"문의하다"},{"id":197,"key":"sign up for","nos":[207],"en":"sign up for","meanings":["~을 신청하다","~에 가입하다"],"ko":"~을 신청하다, ~에 가입하다"},{"id":198,"key":"recruit","nos":[208],"en":"recruit","meanings":["채용하다"],"ko":"채용하다"},{"id":199,"key":"estimate","nos":[209],"en":"estimate","meanings":["견적서"],"ko":"견적서"},{"id":200,"key":"valid","nos":[210],"en":"valid","meanings":["유효한"],"ko":"유효한"},{"id":201,"key":"postpone","nos":[211],"en":"postpone","meanings":["연기하다"],"ko":"연기하다"},{"id":202,"key":"recently","nos":[212],"en":"recently","meanings":["최근에"],"ko":"최근에"},{"id":203,"key":"inspection","nos":[214],"en":"inspection","meanings":["점검","검사"],"ko":"점검, 검사"},{"id":204,"key":"catering","nos":[215],"en":"catering","meanings":["출장 요리","음식 공급(업)"],"ko":"출장 요리, 음식 공급(업)"},{"id":205,"key":"return","nos":[216],"en":"return","meanings":["반품","반납[반품]하다"],"ko":"반품, 반납[반품]하다"},{"id":206,"key":"upcoming","nos":[217],"en":"upcoming","meanings":["다가오는","곧 있을"],"ko":"다가오는, 곧 있을"},{"id":207,"key":"replace","nos":[218],"en":"replace","meanings":["교체하다"],"ko":"교체하다"},{"id":208,"key":"expire","nos":[219],"en":"expire","meanings":["만료되다","만기가 되다"],"ko":"만료되다, 만기가 되다"},{"id":209,"key":"brochure","nos":[220],"en":"brochure","meanings":["소책자"],"ko":"소책자"},{"id":210,"key":"in advance","nos":[221],"en":"in advance","meanings":["미리"],"ko":"미리"},{"id":211,"key":"incorrect","nos":[223],"en":"incorrect","meanings":["부정확한"],"ko":"부정확한"},{"id":212,"key":"continue","nos":[224],"en":"continue","meanings":["계속하다","지속하다"],"ko":"계속하다, 지속하다"},{"id":213,"key":"upgrade","nos":[225],"en":"upgrade","meanings":["개선하다","업그레이드","상향"],"ko":"개선하다, 업그레이드, 상향"},{"id":214,"key":"task","nos":[226],"en":"task","meanings":["업무","과제"],"ko":"업무, 과제"},{"id":215,"key":"recipe","nos":[227],"en":"recipe","meanings":["요리[조리]법"],"ko":"요리[조리]법"},{"id":216,"key":"block","nos":[228],"en":"block","meanings":["막다","차단하다"],"ko":"막다, 차단하다"},{"id":217,"key":"business trip","nos":[229],"en":"business trip","meanings":["출장"],"ko":"출장"},{"id":218,"key":"anniversary","nos":[230],"en":"anniversary","meanings":["기념일"],"ko":"기념일"},{"id":219,"key":"branch","nos":[231],"en":"branch","meanings":["지점"],"ko":"지점"},{"id":220,"key":"improve","nos":[232,463],"en":"improve","meanings":["개선하다","향상시키다"],"ko":"개선하다, 향상시키다"},{"id":221,"key":"résumé","nos":[233,387],"en":"résumé","meanings":["이력서"],"ko":"이력서"},{"id":222,"key":"client","nos":[234,331],"en":"client","meanings":["고객"],"ko":"고객"},{"id":223,"key":"remind","nos":[235],"en":"remind","meanings":["상기시키다"],"ko":"상기시키다"},{"id":224,"key":"reply","nos":[236],"en":"reply","meanings":["응답하다"],"ko":"응답하다"},{"id":225,"key":"talented","nos":[237],"en":"talented","meanings":["재능이 있는"],"ko":"재능이 있는"},{"id":226,"key":"staff meeting","nos":[238],"en":"staff meeting","meanings":["직원 회의"],"ko":"직원 회의"},{"id":227,"key":"latest","nos":[239],"en":"latest","meanings":["최신의"],"ko":"최신의"},{"id":228,"key":"attract","nos":[240,374],"en":"attract","meanings":["(마음을) 끌다","끌어모으다","유치하다"],"ko":"(마음을) 끌다, 끌어모으다, 유치하다"},{"id":229,"key":"board","nos":[241,367],"en":"board","meanings":["탑승하다","이사회"],"ko":"탑승하다, 이사회"},{"id":230,"key":"on sale","nos":[242],"en":"on sale","meanings":["할인 중인","판매 중인"],"ko":"할인 중인, 판매 중인"},{"id":231,"key":"submit","nos":[243],"en":"submit","meanings":["제출하다"],"ko":"제출하다"},{"id":232,"key":"take part in","nos":[244],"en":"take part in","meanings":["~에 참여하다"],"ko":"~에 참여하다"},{"id":233,"key":"found","nos":[245],"en":"found","meanings":["설립하다"],"ko":"설립하다"},{"id":234,"key":"strategy","nos":[246],"en":"strategy","meanings":["전략"],"ko":"전략"},{"id":235,"key":"destination","nos":[247],"en":"destination","meanings":["목적지"],"ko":"목적지"},{"id":236,"key":"host","nos":[248],"en":"host","meanings":["주최하다","진행하다","진행자"],"ko":"주최하다, 진행하다, 진행자"},{"id":237,"key":"last","nos":[249],"en":"last","meanings":["지속[계속]되다"],"ko":"지속[계속]되다"},{"id":238,"key":"article","nos":[250,413],"en":"article","meanings":["기사","글"],"ko":"기사, 글"},{"id":239,"key":"career","nos":[251],"en":"career","meanings":["직업","경력"],"ko":"직업, 경력"},{"id":240,"key":"unique","nos":[252,448],"en":"unique","meanings":["독특한","유일한"],"ko":"독특한, 유일한"},{"id":241,"key":"comfortable","nos":[253,360],"en":"comfortable","meanings":["편안한"],"ko":"편안한"},{"id":242,"key":"performance","nos":[254,498],"en":"performance","meanings":["공연"],"ko":"공연"},{"id":243,"key":"positive","nos":[255,419],"en":"positive","meanings":["긍정적인"],"ko":"긍정적인"},{"id":244,"key":"take place","nos":[256],"en":"take place","meanings":["열리다","발생하다"],"ko":"열리다, 발생하다"},{"id":245,"key":"regular price","nos":[257],"en":"regular price","meanings":["정가"],"ko":"정가"},{"id":246,"key":"agree","nos":[258],"en":"agree","meanings":["동의하다"],"ko":"동의하다"},{"id":247,"key":"request","nos":[259],"en":"request","meanings":["요청","요청하다"],"ko":"요청, 요청하다"},{"id":248,"key":"thanks to","nos":[260],"en":"thanks to","meanings":["~ 덕분에"],"ko":"~ 덕분에"},{"id":249,"key":"free of charge","nos":[261],"en":"free of charge","meanings":["무료로"],"ko":"무료로"},{"id":250,"key":"famous","nos":[262],"en":"famous","meanings":["유명한"],"ko":"유명한"},{"id":251,"key":"successful","nos":[263],"en":"successful","meanings":["성공적인"],"ko":"성공적인"},{"id":252,"key":"audience","nos":[264],"en":"audience","meanings":["청중","관중"],"ko":"청중, 관중"},{"id":253,"key":"fee","nos":[265],"en":"fee","meanings":["요금","수수료"],"ko":"요금, 수수료"},{"id":254,"key":"policy","nos":[266],"en":"policy","meanings":["정책","방침"],"ko":"정책, 방침"},{"id":255,"key":"selection","nos":[267],"en":"selection","meanings":["선택","선택된 것들"],"ko":"선택, 선택된 것들"},{"id":256,"key":"growth","nos":[269],"en":"growth","meanings":["성장","증가"],"ko":"성장, 증가"},{"id":257,"key":"profit","nos":[270,407,471],"en":"profit","meanings":["수익","이익"],"ko":"수익, 이익"},{"id":258,"key":"experience","nos":[271],"en":"experience","meanings":["경험","경력"],"ko":"경험, 경력"},{"id":259,"key":"production","nos":[274],"en":"production","meanings":["생산(량)","제작"],"ko":"생산(량), 제작"},{"id":260,"key":"equipment","nos":[276],"en":"equipment","meanings":["장비","설비"],"ko":"장비, 설비"},{"id":261,"key":"addition","nos":[277],"en":"addition","meanings":["추가(물)"],"ko":"추가(물)"},{"id":262,"key":"safety","nos":[279],"en":"safety","meanings":["안전"],"ko":"안전"},{"id":263,"key":"inconvenience","nos":[280],"en":"inconvenience","meanings":["불편"],"ko":"불편"},{"id":264,"key":"opening","nos":[281],"en":"opening","meanings":["개장","개업"],"ko":"개장, 개업"},{"id":265,"key":"inventory","nos":[282],"en":"inventory","meanings":["재고(품)","재고 조사"],"ko":"재고(품), 재고 조사"},{"id":266,"key":"attention","nos":[283],"en":"attention","meanings":["주의","집중"],"ko":"주의, 집중"},{"id":267,"key":"access","nos":[284],"en":"access","meanings":["이용 권한","접근","접근하다","이용하다"],"ko":"이용 권한, 접근, 접근하다, 이용하다"},{"id":268,"key":"shipment","nos":[286],"en":"shipment","meanings":["배송(품)","선적(물)"],"ko":"배송(품), 선적(물)"},{"id":269,"key":"relocation","nos":[287],"en":"relocation","meanings":["이전","이주"],"ko":"이전, 이주"},{"id":270,"key":"participation","nos":[288],"en":"participation","meanings":["참가","참여"],"ko":"참가, 참여"},{"id":271,"key":"material","nos":[289],"en":"material","meanings":["자료","재료"],"ko":"자료, 재료"},{"id":272,"key":"responsibility","nos":[290],"en":"responsibility","meanings":["책임","임무"],"ko":"책임, 임무"},{"id":273,"key":"requirement","nos":[291],"en":"requirement","meanings":["필요조건","요건"],"ko":"필요조건, 요건"},{"id":274,"key":"reimbursement","nos":[292],"en":"reimbursement","meanings":["상환","변제"],"ko":"상환, 변제"},{"id":275,"key":"summary","nos":[293],"en":"summary","meanings":["요약"],"ko":"요약"},{"id":276,"key":"trend","nos":[294,415],"en":"trend","meanings":["트렌드","경향","동향"],"ko":"트렌드, 경향, 동향"},{"id":277,"key":"shelf","nos":[295],"en":"shelf","meanings":["선반"],"ko":"선반"},{"id":278,"key":"necklace","nos":[296],"en":"necklace","meanings":["목걸이"],"ko":"목걸이"},{"id":279,"key":"sign","nos":[297],"en":"sign","meanings":["표지판"],"ko":"표지판"},{"id":280,"key":"chart","nos":[298],"en":"chart","meanings":["차트"],"ko":"차트"},{"id":281,"key":"railing","nos":[299],"en":"railing","meanings":["난간"],"ko":"난간"},{"id":282,"key":"notepad","nos":[300],"en":"notepad","meanings":["메모지"],"ko":"메모지"},{"id":283,"key":"tray","nos":[301,303],"en":"tray","meanings":["쟁반"],"ko":"쟁반"},{"id":284,"key":"glass","nos":[302],"en":"glass","meanings":["유리컵"],"ko":"유리컵"},{"id":285,"key":"basket","nos":[304],"en":"basket","meanings":["바구니"],"ko":"바구니"},{"id":286,"key":"down the hall","nos":[307],"en":"down the hall","meanings":["복도 아래쪽에"],"ko":"복도 아래쪽에"},{"id":287,"key":"tool kit","nos":[308],"en":"tool kit","meanings":["연장통","공구함"],"ko":"연장통, 공구함"},{"id":288,"key":"fit","nos":[309],"en":"fit","meanings":["(모양","크기가) 맞다"],"ko":"(모양, 크기가) 맞다"},{"id":289,"key":"procedure","nos":[310],"en":"procedure","meanings":["절차"],"ko":"절차"},{"id":290,"key":"press conference","nos":[314],"en":"press conference","meanings":["기자 회견"],"ko":"기자 회견"},{"id":291,"key":"ticket office","nos":[317],"en":"ticket office","meanings":["매표소"],"ko":"매표소"},{"id":292,"key":"move","nos":[318],"en":"move","meanings":["이사하다"],"ko":"이사하다"},{"id":293,"key":"a while ago","nos":[319],"en":"a while ago","meanings":["조금 전에"],"ko":"조금 전에"},{"id":294,"key":"job applicant","nos":[320],"en":"job applicant","meanings":["구직자","취업지원자"],"ko":"구직자, 취업지원자"},{"id":295,"key":"had better","nos":[322],"en":"had better","meanings":["~하는 편이 낫다"],"ko":"~하는 편이 낫다"},{"id":296,"key":"outdoor","nos":[323],"en":"outdoor","meanings":["야외의"],"ko":"야외의"},{"id":297,"key":"festival","nos":[324],"en":"festival","meanings":["축제"],"ko":"축제"},{"id":298,"key":"flyer","nos":[325],"en":"flyer","meanings":["전단"],"ko":"전단"},{"id":299,"key":"have been (to)","nos":[326],"en":"have been (to)","meanings":["~에 가 본적이 있다"],"ko":"~에 가 본적이 있다"},{"id":300,"key":"address","nos":[327],"en":"address","meanings":["주소"],"ko":"주소"},{"id":301,"key":"meet","nos":[328],"en":"meet","meanings":["(기한 등을)지키다","맞추다"],"ko":"(기한 등을)지키다, 맞추다"},{"id":302,"key":"important","nos":[330],"en":"important","meanings":["중요한"],"ko":"중요한"},{"id":303,"key":"make a presentation","nos":[332],"en":"make a presentation","meanings":["발표하다"],"ko":"발표하다"},{"id":304,"key":"informative","nos":[333],"en":"informative","meanings":["유익한"],"ko":"유익한"},{"id":305,"key":"application","nos":[334],"en":"application","meanings":["앱","프로그램"],"ko":"앱, 프로그램"},{"id":306,"key":"process","nos":[335,495],"en":"process","meanings":["과정","절차"],"ko":"과정, 절차"},{"id":307,"key":"visitor","nos":[336],"en":"visitor","meanings":["방문객"],"ko":"방문객"},{"id":308,"key":"receive","nos":[337,366,384],"en":"receive","meanings":["받다"],"ko":"받다"},{"id":309,"key":"free","nos":[338],"en":"free","meanings":["무료의"],"ko":"무료의"},{"id":310,"key":"top-selling","nos":[339],"en":"top-selling","meanings":["가장 잘 팔리는"],"ko":"가장 잘 팔리는"},{"id":311,"key":"present","nos":[340],"en":"present","meanings":["제시하다","보여주다"],"ko":"제시하다, 보여주다"},{"id":312,"key":"entrance","nos":[341],"en":"entrance","meanings":["입구"],"ko":"입구"},{"id":313,"key":"corporation","nos":[342],"en":"corporation","meanings":["기업","법인"],"ko":"기업, 법인"},{"id":314,"key":"decide","nos":[344,487],"en":"decide","meanings":["결정하다"],"ko":"결정하다"},{"id":315,"key":"committee","nos":[345],"en":"committee","meanings":["위원회"],"ko":"위원회"},{"id":316,"key":"introduce","nos":[346],"en":"introduce","meanings":["소개하다","선보이다"],"ko":"소개하다, 선보이다"},{"id":317,"key":"official","nos":[347],"en":"official","meanings":["공무원"],"ko":"공무원"},{"id":318,"key":"following","nos":[348],"en":"following","meanings":["다음의"],"ko":"다음의"},{"id":319,"key":"apply for","nos":[349],"en":"apply for","meanings":["~을 신청하다"],"ko":"~을 신청하다"},{"id":320,"key":"canned","nos":[350],"en":"canned","meanings":["통조림으로 된"],"ko":"통조림으로 된"},{"id":321,"key":"tasty","nos":[351],"en":"tasty","meanings":["맛있는"],"ko":"맛있는"},{"id":322,"key":"occur","nos":[352],"en":"occur","meanings":["발생하다"],"ko":"발생하다"},{"id":323,"key":"mayor","nos":[353],"en":"mayor","meanings":["시장"],"ko":"시장"},{"id":324,"key":"establishment","nos":[354],"en":"establishment","meanings":["설립","수립"],"ko":"설립, 수립"},{"id":325,"key":"account","nos":[355],"en":"account","meanings":["계정"],"ko":"계정"},{"id":326,"key":"on file","nos":[356],"en":"on file","meanings":["기록되어 있는"],"ko":"기록되어 있는"},{"id":327,"key":"determine","nos":[357],"en":"determine","meanings":["결정하다"],"ko":"결정하다"},{"id":328,"key":"scope","nos":[358],"en":"scope","meanings":["범위"],"ko":"범위"},{"id":329,"key":"redevelopment","nos":[359],"en":"redevelopment","meanings":["재개발"],"ko":"재개발"},{"id":330,"key":"complete","nos":[361],"en":"complete","meanings":["마치다"],"ko":"마치다"},{"id":331,"key":"assignment","nos":[362],"en":"assignment","meanings":["임무","업무"],"ko":"임무, 업무"},{"id":332,"key":"promptly","nos":[363],"en":"promptly","meanings":["즉시"],"ko":"즉시"},{"id":333,"key":"chief","nos":[364],"en":"chief","meanings":["최고의"],"ko":"최고의"},{"id":334,"key":"priority","nos":[365],"en":"priority","meanings":["우선사항"],"ko":"우선사항"},{"id":335,"key":"law firm","nos":[369],"en":"law firm","meanings":["법률 사무소"],"ko":"법률 사무소"},{"id":336,"key":"provide","nos":[370],"en":"provide","meanings":["제공하다"],"ko":"제공하다"},{"id":337,"key":"expert","nos":[371],"en":"expert","meanings":["전문가(의)"],"ko":"전문가(의)"},{"id":338,"key":"legal","nos":[372],"en":"legal","meanings":["법적인"],"ko":"법적인"},{"id":339,"key":"issue","nos":[373],"en":"issue","meanings":["문제"],"ko":"문제"},{"id":340,"key":"announce","nos":[375],"en":"announce","meanings":["발표하다"],"ko":"발표하다"},{"id":341,"key":"discuss","nos":[377],"en":"discuss","meanings":["논의하다"],"ko":"논의하다"},{"id":342,"key":"expand","nos":[378],"en":"expand","meanings":["늘리다"],"ko":"늘리다"},{"id":343,"key":"readership","nos":[379],"en":"readership","meanings":["구독자 수"],"ko":"구독자 수"},{"id":344,"key":"salary","nos":[380],"en":"salary","meanings":["급여"],"ko":"급여"},{"id":345,"key":"exchange","nos":[381],"en":"exchange","meanings":["교환하다"],"ko":"교환하다"},{"id":346,"key":"course","nos":[382],"en":"course","meanings":["강좌","강의"],"ko":"강좌, 강의"},{"id":347,"key":"intended for","nos":[383],"en":"intended for","meanings":["~를 위해 의도된"],"ko":"~를 위해 의도된"},{"id":348,"key":"interested","nos":[385],"en":"interested","meanings":["관심있어하는"],"ko":"관심있어하는"},{"id":349,"key":"cover letter","nos":[386],"en":"cover letter","meanings":["자기소개서"],"ko":"자기소개서"},{"id":350,"key":"experienced","nos":[388],"en":"experienced","meanings":["경험이 있는","능숙한"],"ko":"경험이 있는, 능숙한"},{"id":351,"key":"cost","nos":[390],"en":"cost","meanings":["비용"],"ko":"비용"},{"id":352,"key":"public transportation","nos":[391],"en":"public transportation","meanings":["대중교통"],"ko":"대중교통"},{"id":353,"key":"exceed","nos":[392,417],"en":"exceed","meanings":["초과하다","넘어서다"],"ko":"초과하다, 넘어서다"},{"id":354,"key":"rent","nos":[393],"en":"rent","meanings":["대여하다"],"ko":"대여하다"},{"id":355,"key":"by accident","nos":[394],"en":"by accident","meanings":["우연히","실수로"],"ko":"우연히, 실수로"},{"id":356,"key":"suburban","nos":[395],"en":"suburban","meanings":["교외의"],"ko":"교외의"},{"id":357,"key":"to a minimum","nos":[396],"en":"to a minimum","meanings":["최소한도로"],"ko":"최소한도로"},{"id":358,"key":"prepay","nos":[397],"en":"prepay","meanings":["선불하다","선납하다"],"ko":"선불하다, 선납하다"},{"id":359,"key":"registration fee","nos":[398],"en":"registration fee","meanings":["등록비"],"ko":"등록비"},{"id":360,"key":"initial","nos":[400],"en":"initial","meanings":["초기의"],"ko":"초기의"},{"id":361,"key":"qualification","nos":[401],"en":"qualification","meanings":["자격","자질"],"ko":"자격, 자질"},{"id":362,"key":"separate","nos":[402],"en":"separate","meanings":["분리하다"],"ko":"분리하다"},{"id":363,"key":"make an impact","nos":[403],"en":"make an impact","meanings":["영향을 주다"],"ko":"영향을 주다"},{"id":364,"key":"notify","nos":[405],"en":"notify","meanings":["알리다"],"ko":"알리다"},{"id":365,"key":"via","nos":[406],"en":"via","meanings":["~을 통해서"],"ko":"~을 통해서"},{"id":366,"key":"rise","nos":[408],"en":"rise","meanings":["오르다"],"ko":"오르다"},{"id":367,"key":"be satisfied with","nos":[409],"en":"be satisfied with","meanings":["~에 만족하다"],"ko":"~에 만족하다"},{"id":368,"key":"low","nos":[410],"en":"low","meanings":["낮은"],"ko":"낮은"},{"id":369,"key":"quarter","nos":[411],"en":"quarter","meanings":["분기"],"ko":"분기"},{"id":370,"key":"training session","nos":[412],"en":"training session","meanings":["교육"],"ko":"교육"},{"id":371,"key":"industry","nos":[414],"en":"industry","meanings":["산업"],"ko":"산업"},{"id":372,"key":"review","nos":[418],"en":"review","meanings":["평","후기"],"ko":"평, 후기"},{"id":373,"key":"respond","nos":[421],"en":"respond","meanings":["응답하다"],"ko":"응답하다"},{"id":374,"key":"inquiry","nos":[422],"en":"inquiry","meanings":["문의"],"ko":"문의"},{"id":375,"key":"choice","nos":[423],"en":"choice","meanings":["선택"],"ko":"선택"},{"id":376,"key":"department head","nos":[424],"en":"department head","meanings":["부서장"],"ko":"부서장"},{"id":377,"key":"contract","nos":[426,486],"en":"contract","meanings":["계약(서)"],"ko":"계약(서)"},{"id":378,"key":"senior","nos":[427],"en":"senior","meanings":["고위의"],"ko":"고위의"},{"id":379,"key":"recommendation","nos":[428],"en":"recommendation","meanings":["추천"],"ko":"추천"},{"id":380,"key":"previous","nos":[429],"en":"previous","meanings":["이전의"],"ko":"이전의"},{"id":381,"key":"banquet","nos":[430],"en":"banquet","meanings":["연회"],"ko":"연회"},{"id":382,"key":"business district","nos":[431],"en":"business district","meanings":["상업지구"],"ko":"상업지구"},{"id":383,"key":"management","nos":[432],"en":"management","meanings":["경영진","운영진"],"ko":"경영진, 운영진"},{"id":384,"key":"negotiation","nos":[433],"en":"negotiation","meanings":["협상"],"ko":"협상"},{"id":385,"key":"average","nos":[434],"en":"average","meanings":["평균이 되다"],"ko":"평균이 되다"},{"id":386,"key":"per","nos":[435],"en":"per","meanings":["~당","~마다"],"ko":"~당, ~마다"},{"id":387,"key":"region","nos":[437],"en":"region","meanings":["지역"],"ko":"지역"},{"id":388,"key":"publish","nos":[438],"en":"publish","meanings":["출판하다","발행하다"],"ko":"출판하다, 발행하다"},{"id":389,"key":"winner","nos":[440],"en":"winner","meanings":["우승자"],"ko":"우승자"},{"id":390,"key":"oil price","nos":[441],"en":"oil price","meanings":["유가"],"ko":"유가"},{"id":391,"key":"increase","nos":[442],"en":"increase","meanings":["오르다"],"ko":"오르다"},{"id":392,"key":"steadily","nos":[443],"en":"steadily","meanings":["꾸준히"],"ko":"꾸준히"},{"id":393,"key":"search for","nos":[444],"en":"search for","meanings":["~을 찾다"],"ko":"~을 찾다"},{"id":394,"key":"join","nos":[445],"en":"join","meanings":["합류하다"],"ko":"합류하다"},{"id":395,"key":"abroad","nos":[446],"en":"abroad","meanings":["해외에서"],"ko":"해외에서"},{"id":396,"key":"a variety of","nos":[447],"en":"a variety of","meanings":["다양한"],"ko":"다양한"},{"id":397,"key":"survey","nos":[449],"en":"survey","meanings":["설문 조사"],"ko":"설문 조사"},{"id":398,"key":"preference","nos":[450],"en":"preference","meanings":["선호도"],"ko":"선호도"},{"id":399,"key":"relevant","nos":[451],"en":"relevant","meanings":["관련된"],"ko":"관련된"},{"id":400,"key":"expense","nos":[452],"en":"expense","meanings":["경비"],"ko":"경비"},{"id":401,"key":"negative","nos":[453],"en":"negative","meanings":["부정적인"],"ko":"부정적인"},{"id":402,"key":"local","nos":[454],"en":"local","meanings":["지역의"],"ko":"지역의"},{"id":403,"key":"society","nos":[455],"en":"society","meanings":["협회"],"ko":"협회"},{"id":404,"key":"annual","nos":[456],"en":"annual","meanings":["연례의"],"ko":"연례의"},{"id":405,"key":"convention","nos":[457],"en":"convention","meanings":["대회"],"ko":"대회"},{"id":406,"key":"retail","nos":[459],"en":"retail","meanings":["소매","소매의"],"ko":"소매, 소매의"},{"id":407,"key":"space","nos":[460],"en":"space","meanings":["공간"],"ko":"공간"},{"id":408,"key":"author","nos":[461],"en":"author","meanings":["작가"],"ko":"작가"},{"id":409,"key":"construction","nos":[462],"en":"construction","meanings":["건설"],"ko":"건설"},{"id":410,"key":"board of directors","nos":[464],"en":"board of directors","meanings":["이사회"],"ko":"이사회"},{"id":411,"key":"fabric","nos":[465],"en":"fabric","meanings":["직물","천"],"ko":"직물, 천"},{"id":412,"key":"collection","nos":[466],"en":"collection","meanings":["(패션) 신작발표회","수집품"],"ko":"(패션) 신작발표회, 수집품"},{"id":413,"key":"government official","nos":[467],"en":"government official","meanings":["공무원"],"ko":"공무원"},{"id":414,"key":"proposed","nos":[468],"en":"proposed","meanings":["제안된","상정된"],"ko":"제안된, 상정된"},{"id":415,"key":"tax increase","nos":[469],"en":"tax increase","meanings":["세금인상"],"ko":"세금인상"},{"id":416,"key":"significant","nos":[470],"en":"significant","meanings":["상당한"],"ko":"상당한"},{"id":417,"key":"certification exam","nos":[472],"en":"certification exam","meanings":["자격증 시험"],"ko":"자격증 시험"},{"id":418,"key":"registered","nos":[473],"en":"registered","meanings":["공인된","등록된"],"ko":"공인된, 등록된"},{"id":419,"key":"comment","nos":[474],"en":"comment","meanings":["논평","의견"],"ko":"논평, 의견"},{"id":420,"key":"concerning","nos":[475],"en":"concerning","meanings":["~에 관한"],"ko":"~에 관한"},{"id":421,"key":"revise","nos":[476],"en":"revise","meanings":["수정하다"],"ko":"수정하다"},{"id":422,"key":"trail","nos":[478],"en":"trail","meanings":["산책로"],"ko":"산책로"},{"id":423,"key":"subscription","nos":[479],"en":"subscription","meanings":["구독"],"ko":"구독"},{"id":424,"key":"renowned","nos":[480],"en":"renowned","meanings":["유명한"],"ko":"유명한"},{"id":425,"key":"architect","nos":[481],"en":"architect","meanings":["건축가"],"ko":"건축가"},{"id":426,"key":"receipt","nos":[483],"en":"receipt","meanings":["영수증"],"ko":"영수증"},{"id":427,"key":"mandatory","nos":[485],"en":"mandatory","meanings":["의무적인"],"ko":"의무적인"},{"id":428,"key":"additional","nos":[488],"en":"additional","meanings":["추가의"],"ko":"추가의"},{"id":429,"key":"duty","nos":[489],"en":"duty","meanings":["의무","직무"],"ko":"의무, 직무"},{"id":430,"key":"include","nos":[490],"en":"include","meanings":["포함하다"],"ko":"포함하다"},{"id":431,"key":"cleanup","nos":[493],"en":"cleanup","meanings":["대청소"],"ko":"대청소"},{"id":432,"key":"desirable","nos":[494],"en":"desirable","meanings":["바람직한"],"ko":"바람직한"},{"id":433,"key":"strictly","nos":[496],"en":"strictly","meanings":["엄격히"],"ko":"엄격히"},{"id":434,"key":"prohibit","nos":[497],"en":"prohibit","meanings":["금지하다"],"ko":"금지하다"},{"id":435,"key":"consider","nos":[499],"en":"consider","meanings":["고려하다"],"ko":"고려하다"},{"id":436,"key":"ban","nos":[500],"en":"ban","meanings":["금지조치"],"ko":"금지조치"},{"id":437,"key":"allow","nos":[501],"en":"allow","meanings":["허용하다","용납하다"],"ko":"허용하다, 용납하다"},{"id":438,"key":"structural","nos":[502],"en":"structural","meanings":["구조의"],"ko":"구조의"},{"id":439,"key":"integrity","nos":[503],"en":"integrity","meanings":["온전함","완전한상태"],"ko":"온전함, 완전한상태"},{"id":440,"key":"overseas","nos":[504],"en":"overseas","meanings":["해외의","해외로"],"ko":"해외의, 해외로"},{"id":441,"key":"paper","nos":[505],"en":"paper","meanings":["문서","논문"],"ko":"문서, 논문"},{"id":442,"key":"sudden","nos":[506],"en":"sudden","meanings":["갑작스러운"],"ko":"갑작스러운"}];
+const STORAGE_KEY="vocab-study-merged-v1";
+let selectedRange="all", selectedPool="all", selectedMode="mix";
+let current=[], lastWrong=[], hasGraded=false;
+
+function byId(id){return document.getElementById(id)}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function stripMarks(s){return String(s||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"")}
+function norm(s){
+  return stripMarks(s).toLowerCase().trim()
+    .replace(/[~～·•]/g,"")
+    .replace(/\s+/g,"")
+    .replace(/[.,!?;:'"“”‘’()\[\]]/g,"");
+}
+function uniq(arr){const out=[],seen=new Set();for(const x of arr){const n=norm(x);if(n&&!seen.has(n)){seen.add(n);out.push(x)}}return out}
+
+function koreanVariants(text){
+  const v=[text, String(text).replace(/\([^)]*\)/g,"")];
+  const s=String(text).trim();
+  const m=s.match(/^([^\s()]+)\s*\(([^()\s]+)\)$/);
+  if(m){v.push(m[1]);v.push(m[1]+m[2])}
+  v.push(s.replace(/^~\s*[이가은는을를에의로과와에서에게께부터까지]?\s*/,""));
+  return uniq(v);
+}
+function englishVariants(text){
+  const s=String(text).trim();
+  let v=[s];
+  // slash alternatives: get on/board, book/reserve, next to/beside
+  if(s.includes("/")){
+    const parts=s.split("/").map(x=>x.trim()).filter(Boolean);
+    v.push(...parts);
+  }
+  // bracket alternatives: point at[to] -> point at / point to
+  const bm=s.match(/^(.*?)([A-Za-z]+)\[([A-Za-z]+)\](.*)$/);
+  if(bm){
+    v.push((bm[1]+bm[2]+bm[4]).replace(/\s+/g," ").trim());
+    v.push((bm[1]+bm[3]+bm[4]).replace(/\s+/g," ").trim());
+  }
+  // parenthetical notes: shelf (복수형 shelves) -> shelf / shelves
+  v.push(s.replace(/\([^)]*\)/g,"").replace(/\s+/g," ").trim());
+  const pm=s.match(/\(([^)]*)\)/);
+  if(pm){
+    const englishBits=pm[1].match(/[A-Za-z]+(?:[- ][A-Za-z]+)*/g)||[];
+    for(const bit of englishBits){
+      const cleaned=bit.replace(/^plural\s+/i,"").trim();
+      if(cleaned && !/^(plural)$/i.test(cleaned)) v.push(cleaned);
+    }
+  }
+  return uniq(v);
+}
+function isKoreanCorrect(input, word){
+  const n=norm(input); if(!n) return false;
+  let vars=[];
+  for(const m of word.meanings) vars.push(...koreanVariants(m));
+  vars.push(word.meanings.join(", "));
+  return uniq(vars).some(v=>norm(v)===n);
+}
+function isEnglishCorrect(input, word){
+  const n=norm(input); if(!n) return false;
+  return englishVariants(word.en).some(v=>norm(v)===n);
+}
+
+let memoryProgress={};
+function loadProgress(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")||{}}catch(e){return JSON.parse(JSON.stringify(memoryProgress))}
+}
+function saveProgress(p){
+  memoryProgress=JSON.parse(JSON.stringify(p));
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(p))}catch(e){}
+}
+function clearProgressStorage(){
+  memoryProgress={};
+  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+}
+function recFor(p,key){
+  if(!p[key]) p[key]={seen:false,wrong:false,streak:0,attempts:0,correct:0};
+  return p[key];
+}
+function updateStats(){
+  const p=loadProgress();
+  let unseen=0,wrong=0,mastered=0;
+  for(const w of WORDS){
+    const r=p[w.key];
+    if(!r||!r.seen) unseen++;
+    if(r&&r.wrong) wrong++;
+    if(r&&r.streak>=3) mastered++;
+  }
+  byId("statTotal").textContent=WORDS.length;
+  byId("statUnseen").textContent=unseen;
+  byId("statWrong").textContent=wrong;
+  byId("statMastered").textContent=mastered;
+  updatePoolCount();
+}
+function inRange(word){
+  if(selectedRange==="all") return true;
+  const [a,b]=selectedRange.split("-").map(Number);
+  return word.nos.some(n=>n>=a&&n<=b);
+}
+function getPool(){
+  const p=loadProgress();
+  return WORDS.filter(w=>{
+    if(!inRange(w)) return false;
+    const r=p[w.key];
+    if(selectedPool==="wrong") return !!(r&&r.wrong);
+    if(selectedPool==="unseen") return !(r&&r.seen);
+    if(selectedPool==="unmastered") return !(r&&r.streak>=3);
+    return true;
+  });
+}
+function updatePoolCount(){
+  const el=byId("poolCount");
+  if(el) el.textContent=getPool().length;
+}
+function chooseDirection(){
+  if(selectedMode==="mix") return Math.random()<.5?"en-ko":"ko-en";
+  return selectedMode;
+}
+function makeQuestion(word){
+  const dir=chooseDirection();
+  let promptMeaning=null;
+  if(dir==="ko-en") promptMeaning=word.meanings[Math.floor(Math.random()*word.meanings.length)];
+  return {word,dir,promptMeaning};
+}
+function markSeen(items){
+  const p=loadProgress();
+  for(const q of items) recFor(p,q.word.key).seen=true;
+  saveProgress(p);
+}
+function buildQuiz(){
+  const pool=getPool();
+  if(!pool.length){
+    byId("quiz").innerHTML="";
+    byId("empty").className="empty show";
+    byId("actions").style.display="none";
+    return;
+  }
+  const rawCount=byId("countSelect").value;
+  const count=rawCount==="all"?pool.length:Math.min(Number(rawCount),pool.length);
+  const picked=shuffle(pool).slice(0,count).map(makeQuestion);
+  render(picked);
+}
+function render(items){
+  current=items; lastWrong=[]; hasGraded=false;
+  markSeen(items);
+  const quiz=byId("quiz"); quiz.innerHTML="";
+  byId("empty").className="empty";
+  items.forEach((q,i)=>{
+    const w=q.word;
+    const d=document.createElement("div");
+    d.className="q"; d.dataset.i=i; d.dataset.key=w.key;
+    const prompt=q.dir==="en-ko"?w.en:q.promptMeaning;
+    const direction=q.dir==="en-ko"?"한글 입력":"영어 입력";
+    d.innerHTML=`<div class="qhead">
+      <div class="qnum">${i+1}</div>
+      <div class="qmain"><div class="prompt"></div><div class="meta">No. ${w.nos.join(", ")}</div></div>
+      <div class="dir">${direction}</div>
+    </div>
+    <input class="answer-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="정답 입력">
+    <div class="feedback"></div>`;
+    d.querySelector(".prompt").textContent=prompt;
+    const inp=d.querySelector("input");
+    inp.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){
+        e.preventDefault();
+        const nx=quiz.querySelector(`[data-i="${i+1}"] input`);
+        if(nx) nx.focus(); else grade();
+      }
+    });
+    quiz.appendChild(d);
+  });
+  byId("result").className="result";
+  byId("retryBtn").className="action-btn retry";
+  byId("gradeBtn").disabled=false;
+  byId("actions").style.display="block";
+  updateStats();
+  setTimeout(()=>{const first=quiz.querySelector("input");if(first)first.focus()},30);
+}
+function grade(){
+  if(hasGraded||!current.length) return;
+  hasGraded=true;
+  const p=loadProgress();
+  let score=0; const missed=[]; lastWrong=[];
+  const els=[...document.querySelectorAll(".q")];
+  els.forEach((el,i)=>{
+    const q=current[i], w=q.word, inp=el.querySelector("input");
+    const ok=q.dir==="en-ko"?isKoreanCorrect(inp.value,w):isEnglishCorrect(inp.value,w);
+    const r=recFor(p,w.key); r.seen=true; r.attempts=(r.attempts||0)+1;
+    if(ok){
+      score++; r.correct=(r.correct||0)+1; r.streak=(r.streak||0)+1;
+      if(r.streak>=3) r.wrong=false;
+    }else{
+      missed.push(i+1); lastWrong.push(q); r.wrong=true; r.streak=0;
+    }
+    el.className="q graded "+(ok?"correct":"wrong");
+    inp.disabled=true;
+    const fb=el.querySelector(".feedback");
+    if(ok){
+      fb.innerHTML=`<span class="good">정답</span><div class="answer-line">전체 뜻: <strong></strong></div>`;
+      fb.querySelector("strong").textContent=w.meanings.join(", ");
+    }else if(q.dir==="en-ko"){
+      fb.innerHTML=`<span class="bad">오답</span><div class="answer-line">정답: <strong></strong></div>`;
+      fb.querySelector("strong").textContent=w.meanings.join(", ");
+    }else{
+      fb.innerHTML=`<span class="bad">오답</span><div class="answer-line">정답: <strong></strong> <span class="sub"></span></div>`;
+      fb.querySelector("strong").textContent=w.en;
+      fb.querySelector(".sub").textContent="· 전체 뜻: "+w.meanings.join(", ");
+    }
+  });
+  saveProgress(p);
+  byId("score").textContent=`${score} / ${current.length}`;
+  byId("missed").textContent=missed.length?`틀린 문제: ${missed.join(", ")}`:"전부 정답!";
+  byId("result").className="result show";
+  byId("retryBtn").className=lastWrong.length?"action-btn retry show":"action-btn retry";
+  byId("gradeBtn").disabled=true;
+  updateStats();
+}
+function retryWrong(){
+  if(!lastWrong.length) return;
+  const items=lastWrong.map(q=>{
+    const w=q.word, dir=chooseDirection();
+    return {word:w,dir,promptMeaning:dir==="ko-en"?w.meanings[Math.floor(Math.random()*w.meanings.length)]:null};
+  });
+  render(items);
+}
+function setActive(containerId,attr,value){
+  document.querySelectorAll(`#${containerId} .choice`).forEach(b=>b.classList.toggle("active",b.dataset[attr]===value));
+}
+document.querySelectorAll("#rangeGrid .choice").forEach(b=>b.addEventListener("click",()=>{selectedRange=b.dataset.range;setActive("rangeGrid","range",selectedRange);updatePoolCount()}));
+document.querySelectorAll("#poolGrid .choice").forEach(b=>b.addEventListener("click",()=>{selectedPool=b.dataset.pool;setActive("poolGrid","pool",selectedPool);updatePoolCount()}));
+document.querySelectorAll("#modeGrid .choice").forEach(b=>b.addEventListener("click",()=>{selectedMode=b.dataset.mode;setActive("modeGrid","mode",selectedMode)}));
+byId("countSelect").addEventListener("change",updatePoolCount);
+byId("startBtn").addEventListener("click",buildQuiz);
+byId("gradeBtn").addEventListener("click",grade);
+byId("newBtn").addEventListener("click",buildQuiz);
+byId("retryBtn").addEventListener("click",retryWrong);
+byId("resetBtn").addEventListener("click",()=>{
+  if(confirm("오답·미출제·3연속 정답 기록을 전부 초기화할까?")){
+    clearProgressStorage(); updateStats(); byId("quiz").innerHTML=""; byId("actions").style.display="none";
+  }
+});
+
+// 테스트/디버깅 확인용(사이트 동작에는 영향 없음)
+window.VOCAB_APP={WORDS,isKoreanCorrect,isEnglishCorrect,getPool,loadProgress,buildQuiz,getCurrent:()=>current};
+updateStats();
+</script>
+</body>
+</html>
